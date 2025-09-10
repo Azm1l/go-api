@@ -1,0 +1,29 @@
+# Binary output
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+*.test
+*.out
+
+# Build folders
+/bin/
+/obj/
+
+# Vendor dependencies
+/vendor/
+
+# IDE/editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Go modules cache (optional, biasanya cukup go.mod + go.sum di repo)
+/go.sum
+/go.mod
