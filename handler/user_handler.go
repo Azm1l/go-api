@@ -4,6 +4,7 @@ import (
 	"net/http"
 	"strconv"
 
+	"github.com/Azm1l/rest-api-go/dto"
 	"github.com/Azm1l/rest-api-go/entity"
 	"github.com/Azm1l/rest-api-go/service"
 	"github.com/gin-gonic/gin"
@@ -17,20 +18,8 @@ func NewUserHandler(service service.UserService) *UserHandler {
 	return &UserHandler{service}
 }
 
-type CreateUserRequest struct {
-	Name     string `json:"name" binding:"required"`
-	Email    string `json:"email" binding:"required,email"`
-	Password string `json:"password" binding:"required"`
-}
-
-type CreateUserResponse struct {
-	ID    int64  `json:"id"`
-	Name  string `json:"name"`
-	Email string `json:"email"`
-}
-
 func (h *UserHandler) CreateUser(c *gin.Context) {
-	var req CreateUserRequest
+	var req dto.CreateUserRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
@@ -48,7 +37,7 @@ func (h *UserHandler) CreateUser(c *gin.Context) {
 		return
 	}
 
-	resp := CreateUserResponse{
+	resp := dto.UserResponse{
 		ID:    newUser.ID,
 		Name:  newUser.Name,
 		Email: newUser.Email,
@@ -63,7 +52,17 @@ func (h *UserHandler) ShowAllUsers(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
-	c.JSON(http.StatusOK, users)
+
+	var userResponses []dto.UserResponse
+	for _, user := range users {
+		userResponses = append(userResponses, dto.UserResponse{
+			ID:    user.ID,
+			Name:  user.Name,
+			Email: user.Email,
+		})
+	}
+
+	c.JSON(http.StatusOK, userResponses)
 }
 
 func (h *UserHandler) FindUserByID(c *gin.Context) {
@@ -79,5 +78,12 @@ func (h *UserHandler) FindUserByID(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
-	c.JSON(http.StatusOK, user)
+
+	resp := dto.UserResponse{
+		ID:    user.ID,
+		Name:  user.Name,
+		Email: user.Email,
+	}
+
+	c.JSON(http.StatusOK, resp)
 }
