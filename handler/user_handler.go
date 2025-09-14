@@ -7,6 +7,7 @@ import (
 	"github.com/Azm1l/rest-api-go/dto"
 	"github.com/Azm1l/rest-api-go/entity"
 	"github.com/Azm1l/rest-api-go/service"
+	"github.com/Azm1l/rest-api-go/utils"
 	"github.com/gin-gonic/gin"
 )
 
@@ -25,10 +26,16 @@ func (h *UserHandler) CreateUser(c *gin.Context) {
 		return
 	}
 
+	hashedPassword, err := utils.HashPassword(req.Password)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to hash password"})
+		return
+	}
+
 	user := &entity.User{
 		Name:     req.Name,
 		Email:    req.Email,
-		Password: req.Password, // production: jangan lupa hash password!
+		Password: hashedPassword,
 	}
 
 	newUser, err := h.service.CreateUser(user)

@@ -7,8 +7,9 @@ import (
 
 type UserRepository interface {
 	Create(user *entity.User) (*entity.User, error)
-	ShowAll() ([]*entity.User, error)
+	ShowAll() ([]entity.User, error)
 	FindOne(id int64) (*entity.User, error)
+	DeleteUser(id int64) error
 }
 
 type userRepository struct {
@@ -26,8 +27,8 @@ func (r *userRepository) Create(user *entity.User) (*entity.User, error) {
 	return user, nil
 }
 
-func (r *userRepository) ShowAll() ([]*entity.User, error) {
-	var users []*entity.User
+func (r *userRepository) ShowAll() ([]entity.User, error) {
+	var users []entity.User
 	if err := r.db.Find(&users).Error; err != nil {
 		return nil, err
 	}
@@ -35,9 +36,17 @@ func (r *userRepository) ShowAll() ([]*entity.User, error) {
 }
 
 func (r *userRepository) FindOne(id int64) (*entity.User, error) {
-	var user *entity.User
+	var user entity.User
 	if err := r.db.First(&user, id).Error; err != nil {
 		return nil, gorm.ErrRecordNotFound
 	}
-	return user, nil
+	return &user, nil
+}
+
+func (r *userRepository) DeleteUser(id int64) error {
+	var user entity.User
+	if err := r.db.Delete(&user, id).Error; err != nil {
+		return err
+	}
+	return nil
 }
