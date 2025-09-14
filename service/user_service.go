@@ -7,7 +7,7 @@ import (
 
 type UserService interface {
 	CreateUser(user *entity.User) (*entity.User, error)
-	ShowAllUsers() ([]entity.User, error)
+	ShowAllUsers() ([]*entity.User, error)
 	FindUserByID(id int64) (*entity.User, error)
 }
 
@@ -23,7 +23,7 @@ func (s *userService) CreateUser(user *entity.User) (*entity.User, error) {
 	return s.repo.Create(user)
 }
 
-func (s *userService) ShowAllUsers() ([]entity.User, error) {
+func (s *userService) ShowAllUsers() ([]*entity.User, error) {
 	return s.repo.ShowAll()
 }
 
