@@ -82,7 +82,7 @@ func (h *UserHandler) FindUserByID(c *gin.Context) {
 
 	user, err := h.service.FindUserByID(id)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		c.JSON(http.StatusNotFound, gin.H{"error": err.Error()})
 		return
 	}
 
