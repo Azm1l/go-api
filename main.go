@@ -9,9 +9,14 @@ import (
 	"github.com/Azm1l/rest-api-go/repository"
 	"github.com/Azm1l/rest-api-go/service"
 	"github.com/gin-gonic/gin"
+	"github.com/joho/godotenv"
 )
 
 func main() {
+	err := godotenv.Load()
+	if err != nil {
+		log.Fatal("Error loading .env file")
+	}
 	db, err := config.ConnectDB()
 
 	if err != nil {
