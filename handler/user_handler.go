@@ -5,9 +5,7 @@ import (
 	"strconv"
 
 	"github.com/Azm1l/rest-api-go/dto"
-	"github.com/Azm1l/rest-api-go/entity"
 	"github.com/Azm1l/rest-api-go/service"
-	"github.com/Azm1l/rest-api-go/utils"
 	"github.com/gin-gonic/gin"
 )
 
@@ -21,24 +19,14 @@ func NewUserHandler(service service.UserService) *UserHandler {
 
 func (h *UserHandler) CreateUser(c *gin.Context) {
 	var req dto.CreateUserRequest
+
 	if err := c.ShouldBindJSON(&req); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 
-	hashedPassword, err := utils.HashPassword(req.Password)
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to hash password"})
-		return
-	}
+	newUser, err := h.service.CreateUser(req)
 
-	user := &entity.User{
-		Name:     req.Name,
-		Email:    req.Email,
-		Password: hashedPassword,
-	}
-
-	newUser, err := h.service.CreateUser(user)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
@@ -92,5 +80,31 @@ func (h *UserHandler) FindUserByID(c *gin.Context) {
 		Email: user.Email,
 	}
 
+	c.JSON(http.StatusOK, resp)
+}
+
+func (h *UserHandler) UpdateUser(c *gin.Context) {
+	idParam := c.Param("id")
+	id, err := strconv.ParseInt(idParam, 10, 64)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid user ID"})
+		return
+	}
+	var req dto.UpdateUserRequest
+
+	if err := c.ShouldBindJSON(&req); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+	updatedUser, err := h.service.UpdateUser(id, req)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+	resp := dto.UserResponse{
+		ID:    updatedUser.ID,
+		Name:  updatedUser.Name,
+		Email: updatedUser.Email,
+	}
 	c.JSON(http.StatusOK, resp)
 }
