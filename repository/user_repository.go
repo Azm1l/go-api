@@ -8,7 +8,9 @@ import (
 type UserRepository interface {
 	Create(user *entity.User) (*entity.User, error)
 	ShowAll() ([]entity.User, error)
-	FindOne(id int64) (*entity.User, error)
+	FindById(id int64) (*entity.User, error)
+	FindByEmail(email string) (*entity.User, error)
+	Update(user *entity.User) (*entity.User, error)
 	DeleteUser(id int64) error
 }
 
@@ -21,6 +23,7 @@ func NewUserRepository(db *gorm.DB) UserRepository {
 }
 
 func (r *userRepository) Create(user *entity.User) (*entity.User, error) {
+
 	if err := r.db.Create(user).Error; err != nil {
 		return nil, err
 	}
@@ -35,12 +38,27 @@ func (r *userRepository) ShowAll() ([]entity.User, error) {
 	return users, nil
 }
 
-func (r *userRepository) FindOne(id int64) (*entity.User, error) {
+func (r *userRepository) FindById(id int64) (*entity.User, error) {
 	var user entity.User
 	if err := r.db.First(&user, id).Error; err != nil {
 		return nil, gorm.ErrRecordNotFound
 	}
 	return &user, nil
+}
+
+func (r *userRepository) FindByEmail(email string) (*entity.User, error) {
+	var user entity.User
+	if err := r.db.Where("email = ?", email).First(&user).Error; err != nil {
+		return nil, gorm.ErrRecordNotFound
+	}
+	return &user, nil
+}
+
+func (r *userRepository) Update(user *entity.User) (*entity.User, error) {
+	if err := r.db.Save(user).Error; err != nil {
+		return nil, err
+	}
+	return user, nil
 }
 
 func (r *userRepository) DeleteUser(id int64) error {
