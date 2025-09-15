@@ -3,11 +3,10 @@ package main
 import (
 	"log"
 
+	"github.com/Azm1l/rest-api-go/bootstrap"
 	"github.com/Azm1l/rest-api-go/config"
 	"github.com/Azm1l/rest-api-go/entity"
-	"github.com/Azm1l/rest-api-go/handler"
-	"github.com/Azm1l/rest-api-go/repository"
-	"github.com/Azm1l/rest-api-go/service"
+	"github.com/Azm1l/rest-api-go/routes"
 	"github.com/gin-gonic/gin"
 	"github.com/joho/godotenv"
 )
@@ -25,16 +24,11 @@ func main() {
 	// auto migrate
 	db.AutoMigrate(&entity.User{})
 
-	//init layer
-	userRepo := repository.NewUserRepository(db)
-	userService := service.NewUserService(userRepo)
-	userHandler := handler.NewUserHandler(userService)
+	//dependencies
+	deps := bootstrap.InitDependencies(db)
 
 	r := gin.Default()
 
-	user := r.Group("user")
-	user.POST("/", userHandler.CreateUser)
-	user.GET("/", userHandler.ShowAllUsers)
-	user.GET("/:id", userHandler.FindUserByID)
+	routes.UserRoutes(r, deps.UserHandler)
 	r.Run(":8080")
 }
