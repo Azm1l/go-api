@@ -6,6 +6,7 @@ import (
 
 	"github.com/Azm1l/rest-api-go/dto"
 	"github.com/Azm1l/rest-api-go/service"
+	"github.com/Azm1l/rest-api-go/utils"
 	"github.com/gin-gonic/gin"
 )
 
@@ -21,7 +22,7 @@ func (h *UserHandler) CreateUser(c *gin.Context) {
 	var req dto.CreateUserRequest
 
 	if err := c.ShouldBindJSON(&req); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		utils.HandleValidationError(c, err)
 		return
 	}
 
@@ -93,7 +94,7 @@ func (h *UserHandler) UpdateUser(c *gin.Context) {
 	var req dto.UpdateUserRequest
 
 	if err := c.ShouldBindJSON(&req); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		utils.HandleValidationError(c, err)
 		return
 	}
 	updatedUser, err := h.service.UpdateUser(id, req)
