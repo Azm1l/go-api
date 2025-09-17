@@ -31,6 +31,6 @@ func HandleValidationError(c *gin.Context, err error) {
 		})
 		return
 	}
-
-	c.JSON(http.StatusBadRequest, gin.H{"error": "Validation failed", "details": "Invalid JSON format"})
+	validationErrors = append(validationErrors, "Invalid JSON format")
+	c.JSON(http.StatusBadRequest, gin.H{"error": "Validation failed", "details": validationErrors})
 }
